@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -42,6 +43,8 @@ android {
 }
 
 dependencies {
+
+    implementation(project(":data"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -57,4 +60,15 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // hilt
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.compiler)
+    implementation(libs.hilt.navigation)
+
+    // navigation compose
+    implementation(libs.androidx.compose.navigation)
+
+    // coroutine
+    implementation(libs.kotlinx.coroutines.android)
 }

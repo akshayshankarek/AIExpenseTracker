@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AIExpenseTracker"
 include(":app")
- 
+include(":data")
