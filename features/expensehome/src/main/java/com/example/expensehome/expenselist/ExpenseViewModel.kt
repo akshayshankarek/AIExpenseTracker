@@ -1,4 +1,4 @@
-package com.example.expensehome
+package com.example.expensehome.expenselist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
