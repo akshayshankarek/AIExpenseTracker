@@ -1,18 +1,37 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.dev.tools)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
     namespace = "com.example.data"
     compileSdk = 36
 
+    buildFeatures{
+        buildConfig = true
+    }
     defaultConfig {
         minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        val localProps = project.rootProject.file("local.properties")
+        val properties = Properties()
+        if (localProps.exists()) {
+            localProps.inputStream().use {
+                properties.load(it)
+            }
+        }
+        buildConfigField(
+            "String",
+            "GEMINI_API_KEY",
+            "\"${properties.getProperty("GEMINI_API_KEY")}\""
+        )
     }
 
     buildTypes {
@@ -56,4 +75,10 @@ dependencies {
 
     // coroutine
     implementation(libs.kotlinx.coroutines.android)
+
+    //ktor
+    implementation(libs.ktor.core)
+    implementation(libs.ktor.cio)
+    implementation(libs.ktor.content.negotitaion)
+    implementation(libs.ktor.serialization)
 }
