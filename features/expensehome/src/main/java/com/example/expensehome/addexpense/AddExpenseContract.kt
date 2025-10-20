@@ -6,7 +6,8 @@ internal interface AddExpenseContract {
         val amount: String,
         val category: String,
         val isSaving: Boolean,
-        val isSuggestionLoading: Boolean
+        val isSuggestionLoading: Boolean,
+        val addExpenseType: ADD_EXPENSE_TYPE
     ){
         companion object {
             val Default = ViewState(
@@ -14,8 +15,14 @@ internal interface AddExpenseContract {
                 amount = "",
                 category = "",
                 isSaving = false,
-                isSuggestionLoading = false
+                isSuggestionLoading = false,
+                addExpenseType = ADD_EXPENSE_TYPE.DEFAULT
             )
         }
+    }
+
+    enum class ADD_EXPENSE_TYPE {
+        DEFAULT,
+        SCAN
     }
 }
