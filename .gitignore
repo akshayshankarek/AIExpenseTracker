@@ -12,6 +12,7 @@
 /.idea/misc.xml
 /.idea/vcs.xml
 /.idea/AndroidProjectSystem.xml.xml
+/.idea*
 .DS_Store
 /build
 /captures

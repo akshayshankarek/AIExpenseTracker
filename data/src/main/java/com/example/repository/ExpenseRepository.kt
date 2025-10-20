@@ -2,7 +2,9 @@ package com.example.repository
 
 import com.example.data.local.dao.ExpenseDao
 import com.example.data.model.Expense
+import com.example.data.remote.model.PromptType
 import com.example.data.remote.GeminiService
+import com.example.data.remote.model.ExpenseExtractionResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,7 +25,11 @@ class ExpenseRepository @Inject constructor(
         expenseDao.deleteExpense(expense)
     }
 
-    suspend fun getSuggestedCategory(title: String): String {
-        return geminiService.suggestCategory(title)
+    suspend fun getSuggestionFromGemini(title: String, promptType: PromptType): String {
+        return geminiService.suggestionRequest(title, promptType)
+    }
+
+    suspend fun extractExpenseDetailsFromGemini(text: String): ExpenseExtractionResult {
+        return geminiService.extractExpenseDetails(text)
     }
 }

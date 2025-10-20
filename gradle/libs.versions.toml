@@ -19,6 +19,10 @@ ksp = "2.0.21-1.0.27"
 composeCompiler = "1.6.10"
 kotlinx-serialization = "1.6.3"
 ktor = "3.0.0"
+camerax = "1.4.0"
+mltoolkit = "16.0.0"
+coroutinesPlayService= "1.8.1"
+bytebeats = "0.1.1"
 
 
 [libraries]
@@ -37,6 +41,7 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlin-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutinesPlayService" }
 androidx-compose-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
 #hilt
@@ -62,6 +67,20 @@ ktor-core = { module = "io.ktor:ktor-client-core", name = "core", version.ref = 
 ktor-cio = { module = "io.ktor:ktor-client-cio", name = "cio", version.ref = "ktor" }
 ktor-content-negotitaion = { module = "io.ktor:ktor-client-content-negotiation", name = "content-negotiation", version.ref = "ktor" }
 ktor-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", name = "serialization", version.ref = "ktor" }
+
+#camerax
+camerax-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
+camerax-camera = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
+camerax-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
+camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
+camerax-extensions = { group = "androidx.camera", name = "camera-extensions", version.ref = "camerax" }
+
+#ml-toolkit
+mlkit = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mltoolkit" }
+mlkit-latin = { group = "com.google.mlkit", name = "text-recognition-latin", version.ref = "mltoolkit" }
+
+#chart
+bytebeats-charts = { group = "io.github.bytebeats", name = "compose-charts", version.ref = "bytebeats" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
