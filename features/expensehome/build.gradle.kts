@@ -43,6 +43,8 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":data"))
     implementation(project(":design"))
+    implementation(project(":features:camerax"))
+    implementation(project(":features:mltoolkit"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -70,4 +72,7 @@ dependencies {
 
     // coroutine
     implementation(libs.kotlinx.coroutines.android)
+
+    //bytebeats chart
+    implementation(libs.bytebeats.charts)
 }

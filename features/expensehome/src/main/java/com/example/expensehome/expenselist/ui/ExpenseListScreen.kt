@@ -1,6 +1,5 @@
 package com.example.expensehome.expenselist.ui
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +13,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -29,19 +32,19 @@ internal fun ExpenseListScreen(
 ) {
     val expenses by viewModel.expenses.collectAsState()
 
-
-    ExpenseListHome(expenses, onAddClick)
+    ExpenseHome(expenses, onAddClick)
 
 }
 
 @Composable
-fun ExpenseListHome(expenses: List<Expense>, onAddClick: () -> Unit) {
+fun ExpenseHome(expenses: List<Expense>, onAddClick: () -> Unit) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddClick
+                
             ) {
-                Text("+")
+                Text("+ Add", style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
             }
         }
     ) { paddingValues ->
@@ -49,14 +52,18 @@ fun ExpenseListHome(expenses: List<Expense>, onAddClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(6.dp)
+                .padding(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (expenses.isEmpty()) {
-                Text(text = "No expenses yet", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "No expenses yet", style = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.SansSerif))
             } else {
-                Text("Expenses", style = MaterialTheme.typography.headlineMedium)
+                Text("Expense Tracker", style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(8.dp))
                 LazyColumn {
+                    item {
+                        ExpensePieChart(expenses)
+                    }
                     items(expenses.size) { index ->
                         val item = expenses[index]
                         ExpenseItem(item)
@@ -71,7 +78,7 @@ fun ExpenseListHome(expenses: List<Expense>, onAddClick: () -> Unit) {
 @Composable
 fun ExpenseListScreenPreview() {
     AIExpenseTrackerTheme {
-        ExpenseListHome(
+        ExpenseHome(
             expenses = listOf(
                 Expense(title = "Netflix", category = "Entertainment", amount = 155.0),
                 Expense(title = "Spotify", category = "Entertainment", amount = 155.0),

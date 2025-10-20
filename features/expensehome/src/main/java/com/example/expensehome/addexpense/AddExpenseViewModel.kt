@@ -1,14 +1,18 @@
 package com.example.expensehome.addexpense
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.model.Expense
+import com.example.data.remote.model.PromptType
+import com.example.mltoolkit.ReceiptTextExtractor
 import com.example.repository.ExpenseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,7 +62,10 @@ internal class AddExpenseViewModel @Inject constructor(
         viewModelScope.launch {
             isSuggestionLoading(true)
             try {
-                val suggestion = expenseRepository.getSuggestedCategory(titleText)
+                val suggestion = expenseRepository.getSuggestionFromGemini(
+                    titleText,
+                    promptType = PromptType.CATEGORY_SUGGESTION
+                )
                 mutableViewState.update { it.copy(category = suggestion) }
             } catch (e: Exception) {
                 mutableViewState.update { it.copy(category = "Others") }
@@ -66,5 +73,40 @@ internal class AddExpenseViewModel @Inject constructor(
                 isSuggestionLoading(false)
             }
         }
+    }
+
+    fun onScanReceipt() {
+        mutableViewState.update { it.copy(addExpenseType = AddExpenseContract.ADD_EXPENSE_TYPE.SCAN) }
+    }
+
+    fun onImageCaptured(it: File) {
+        viewModelScope.launch {
+            val text = ReceiptTextExtractor.extractText(it)
+            fillFromText(text)
+            mutableViewState.update { it.copy(addExpenseType = AddExpenseContract.ADD_EXPENSE_TYPE.DEFAULT) }
+        }
+    }
+
+    private fun fillFromText(text: String) {
+        viewModelScope.launch {
+            try {
+                isSuggestionLoading(true)
+                val response = expenseRepository.extractExpenseDetailsFromGemini(
+                    text
+                )
+                mutableViewState.update {
+                    it.copy(
+                        amount = response.amount.toString(),
+                        category = response.category.toString(),
+                        title = response.title.toString()
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("AddExpenseViewModel", "fillFromText: ", e)
+            } finally {
+                isSuggestionLoading(false)
+            }
+        }
+
     }
 }
