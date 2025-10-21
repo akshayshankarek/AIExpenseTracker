@@ -71,10 +71,10 @@ internal fun AiPulseLoader() {
                     ), shape = CircleShape
                 )
         )
-        Text(
-            text = stringResource(R.string.extracting_with_ai),
-            style = MaterialTheme.typography.titleMedium,
-            color = Color.DarkGray
-        )
+//        Text(
+//            text = stringResource(R.string.extracting_with_ai),
+//            style = MaterialTheme.typography.titleMedium,
+//            color = Color.DarkGray
+//        )
     }
 }
