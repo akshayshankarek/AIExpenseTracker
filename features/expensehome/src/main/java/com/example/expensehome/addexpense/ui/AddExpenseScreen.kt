@@ -1,7 +1,6 @@
 package com.example.expensehome.addexpense.ui
 
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,48 +20,66 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.example.camerax.ReceiptScannerScreen
 import com.example.design.theme.AIExpenseTrackerTheme
+import com.example.expensehome.R
 import com.example.expensehome.addexpense.AddExpenseContract
 import com.example.expensehome.addexpense.AddExpenseViewModel
 
 @Composable
 internal fun AddExpenseScreen(
     viewModel: AddExpenseViewModel = hiltViewModel(),
-    onSaveSuccess: () -> Unit
+    navigateToHome: () -> Unit
 ) {
-    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
-    when (viewState.addExpenseType) {
-        AddExpenseContract.ADD_EXPENSE_TYPE.DEFAULT -> {
-            AddExpenseHome(
-                viewState,
-                onSave = {
-                    viewModel.saveExpense()
-                    onSaveSuccess()
-                },
-                onTitleChange = { viewModel.onTitleChange(it) },
-                onAmountChange = { viewModel.onAmountChange(it) },
-                onCategoryChange = { viewModel.onCategoryChange(it) },
-                onAiCategorySearch = { viewModel.onAiCategorySearch() },
-                isSuggestionLoading = viewState.isSuggestionLoading,
-                onScanReceipt = { viewModel.onScanReceipt() }
-            )
-        }
-
-        AddExpenseContract.ADD_EXPENSE_TYPE.SCAN -> {
-            ReceiptScannerScreen(onImageCaptured = { viewModel.onImageCaptured(it) })
+    fun handleActions(action: AddExpenseContract.Actions) {
+        when (action) {
+            AddExpenseContract.Actions.NavigateToHome -> navigateToHome()
         }
     }
 
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(viewModel.actions) {
+        viewModel.actions.flowWithLifecycle(
+            lifecycle = lifecycle,
+            Lifecycle.State.RESUMED
+        ).collect(::handleActions)
+    }
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+    when (viewState.addExpenseType) {
+        AddExpenseContract.AddExpenseType.DEFAULT -> {
+            AddExpenseHome(
+                viewState,
+                onSave = {
+                    viewModel.onEvent(AddExpenseContract.Event.SaveExpenseClicked)
+                },
+                onTitleChange = { viewModel.onEvent(AddExpenseContract.Event.TitleChanged(it)) },
+                onAmountChange = { viewModel.onEvent(AddExpenseContract.Event.AmountChanged(it)) },
+                onCategoryChange = { viewModel.onEvent(AddExpenseContract.Event.CategoryChanged(it)) },
+                onAiCategorySearch = { viewModel.onEvent(AddExpenseContract.Event.AiCategorySearchClicked) },
+                isSuggestionLoading = viewState.isSuggestionLoading,
+                onScanReceipt = { viewModel.onEvent(AddExpenseContract.Event.ScanReceiptClicked) },
+                errorMessage = viewState.errorMessage
+            )
+        }
+
+        AddExpenseContract.AddExpenseType.SCAN -> {
+            ReceiptScannerScreen(onImageCaptured = { viewModel.onImageCaptured(it) })
+        }
+    }
 }
 
 @Composable
@@ -74,7 +91,8 @@ internal fun AddExpenseHome(
     onCategoryChange: (String) -> Unit,
     onAiCategorySearch: () -> Unit,
     isSuggestionLoading: Boolean,
-    onScanReceipt: () -> Unit
+    onScanReceipt: () -> Unit,
+    errorMessage: String?
 ) {
     Box() {
         if (isSuggestionLoading) {
@@ -86,12 +104,15 @@ internal fun AddExpenseHome(
                 .padding(16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Add Expenses", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                stringResource(R.string.add_expenses),
+                style = MaterialTheme.typography.headlineMedium
+            )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = viewState.title,
                 onValueChange = { onTitleChange(it) },
-                label = { Text("Title") },
+                label = { Text(stringResource(R.string.title)) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.Black,
@@ -104,7 +125,7 @@ internal fun AddExpenseHome(
             OutlinedTextField(
                 value = viewState.amount,
                 onValueChange = { onAmountChange(it) },
-                label = { Text("Amount") },
+                label = { Text(stringResource(R.string.amount)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,7 +141,7 @@ internal fun AddExpenseHome(
             OutlinedTextField(
                 value = viewState.category,
                 onValueChange = { onCategoryChange(it) },
-                label = { Text("Category") },
+                label = { Text(stringResource(R.string.category)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 12.dp),
@@ -131,6 +152,12 @@ internal fun AddExpenseHome(
                     unfocusedBorderColor = Color.Black
                 )
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            errorMessage?.let {
+                Text(text = errorMessage, color = Color.Red)
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -149,7 +176,7 @@ internal fun AddExpenseHome(
             ) {
                 Icon(Icons.Default.Done, contentDescription = null)
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -162,7 +189,7 @@ internal fun AddExpenseHome(
             ) {
                 Icon(Icons.Default.AddCircle, contentDescription = null)
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Scan Receipt")
+                Text(stringResource(R.string.scan_receipt))
             }
         }
     }
@@ -179,9 +206,11 @@ fun AddExpenseScreenPreview() {
             onTitleChange = {},
             onAmountChange = {},
             onCategoryChange = {},
-            isSuggestionLoading = true,
             onAiCategorySearch = {},
-            onScanReceipt = {})
+            isSuggestionLoading = true,
+            onScanReceipt = {},
+            errorMessage = null
+        )
     }
 
 }

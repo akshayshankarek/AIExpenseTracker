@@ -3,6 +3,7 @@ package com.example.data.di
 import com.example.data.local.dao.ExpenseDao
 import com.example.data.remote.GeminiService
 import com.example.repository.ExpenseRepository
+import com.example.repository.ExpenseRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,6 +20,6 @@ object RepositoryModule {
         expenseDao: ExpenseDao,
         geminiService: GeminiService
     ): ExpenseRepository {
-        return ExpenseRepository(expenseDao, geminiService)
+        return ExpenseRepositoryImpl(expenseDao, geminiService)
     }
 }

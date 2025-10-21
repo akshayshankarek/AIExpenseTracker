@@ -1,6 +1,7 @@
 package com.example.expensehome.expenselist.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.data.model.Expense
 import com.example.data.remote.normalizeCategory
@@ -50,22 +52,44 @@ internal fun ExpensePieChart(expenses: List<Expense>) {
             sliceDrawer = SimpleSliceDrawer(sliceThickness = 40f)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        categoryTotals.forEach { (category, amount) ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 4.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .background(generateColorForCategory(category), shape = CircleShape)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    "$category - ₹%.2f".format(amount),
-                    style = MaterialTheme.typography.body1,
-                    color = Purple40
-                )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp) // Adds space between each row
+        ) {
+            categoryTotals.forEach { (category, amount) ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // This Row contains the color dot and category name
+                    Row(
+                        modifier = Modifier.weight(1f), // Takes up all available space
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(16.dp)
+                                .background(
+                                    color = generateColorForCategory(category),
+                                    shape = CircleShape
+                                )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = category,
+                            style = MaterialTheme.typography.body1,
+                            color = Purple40
+                        )
+                    }
+
+                    // The amount is in its own Text composable, aligned to the end
+                    Text(
+                        text = "₹%.2f".format(amount),
+                        style = MaterialTheme.typography.body1,
+                        color = Purple40,
+                        textAlign = TextAlign.End
+                    )
+                }
             }
         }
     }

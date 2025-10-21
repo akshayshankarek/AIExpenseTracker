@@ -18,8 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.design.theme.NeonBlue
+import com.example.expensehome.R
 import kotlinx.coroutines.delay
 
 @Composable
@@ -70,7 +72,7 @@ internal fun AiPulseLoader() {
                 )
         )
         Text(
-            text = "Extracting with AI...",
+            text = stringResource(R.string.extracting_with_ai),
             style = MaterialTheme.typography.titleMedium,
             color = Color.DarkGray
         )

@@ -57,7 +57,7 @@ class GeminiService() {
             }
 
             val geminiResponse = response.body<GeminiResponse>()
-            println("Gemini response" + geminiResponse.toString())
+            println("Gemini response$geminiResponse")
             geminiResponse.candidates
                 .firstOrNull()
                 ?.content

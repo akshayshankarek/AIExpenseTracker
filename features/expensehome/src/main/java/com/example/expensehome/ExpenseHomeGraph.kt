@@ -21,7 +21,7 @@ fun NavGraphBuilder.expenseHomeGraph(navHostController: NavHostController) {
     composable(
         route = NavRoutes.AddExpense.route
     ) {
-        AddExpenseScreen(onSaveSuccess = { navHostController.popBackStack() })
+        AddExpenseScreen(navigateToHome = { navHostController.popBackStack() })
     }
 }
 
