@@ -23,6 +23,7 @@ camerax = "1.4.0"
 mltoolkit = "16.0.0"
 coroutinesPlayService= "1.8.1"
 bytebeats = "0.1.1"
+turbine = "1.0.0"
 
 
 [libraries]
@@ -61,6 +62,12 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+
+#testing
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+
 
 #ktor
 ktor-core = { module = "io.ktor:ktor-client-core", name = "core", version.ref = "ktor" }
