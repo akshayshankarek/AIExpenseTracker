@@ -26,7 +26,7 @@ class ExpenseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSuggestionFromGemini(title: String, promptType: PromptType): String {
-        return geminiService.suggestionRequest(title, promptType)
+        return geminiService.generateContent(title, promptType)
     }
 
     override suspend fun extractExpenseDetailsFromGemini(text: String): ExpenseExtractionResult {

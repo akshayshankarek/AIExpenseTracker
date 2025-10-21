@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.data.model.Expense
-import com.example.data.remote.normalizeCategory
+import com.example.data.utils.normalizeCategory
 import com.example.design.theme.Purple40
 import com.example.design.utils.generateColorForCategory
 import me.bytebeats.views.charts.pie.PieChart

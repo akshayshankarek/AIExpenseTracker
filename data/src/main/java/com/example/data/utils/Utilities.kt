@@ -1,8 +1,10 @@
 package com.example.data.utils
 
+import com.example.data.remote.model.ExpenseExtractionResult
 import com.example.data.remote.model.GeminiContent
 import com.example.data.remote.model.GeminiPart
 import com.example.data.remote.model.PromptType
+import org.json.JSONObject
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -218,4 +220,25 @@ fun formatDateFromMillis(millis: Long?): String {
     val instant = Instant.ofEpochMilli(millis)
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy").withZone(ZoneId.systemDefault())
     return formatter.format(instant)
+}
+
+fun String.parseGeminiExtractExpenseJson(): ExpenseExtractionResult {
+    return try {
+        val jsonStart = this.indexOf("{")
+        val jsonEnd = this.lastIndexOf("}")
+        if (jsonStart == -1 || jsonEnd == -1) {
+            return ExpenseExtractionResult()
+        }
+        val jsonString = this.substring(jsonStart, jsonEnd + 1)
+        val json = JSONObject(jsonString)
+        ExpenseExtractionResult(
+            title = json.optString("merchant"),
+            amount = json.optString("amount"),
+            date = json.optString("date"),
+            category = json.optString("category")
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        ExpenseExtractionResult()
+    }
 }
