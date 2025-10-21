@@ -14,9 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.design.theme.NeonBlue
+import com.example.expensehome.R
 
 @Composable
 internal fun AiSuggestButton(
@@ -37,7 +39,7 @@ internal fun AiSuggestButton(
     ) {
         Icon(Icons.Default.Star, contentDescription = "Suggest")
         Spacer(Modifier.width(8.dp))
-        Text(text = "Ask AI to Suggest Category")
+        Text(text = stringResource(R.string.ask_ai_to_suggest_category))
     }
 }
 

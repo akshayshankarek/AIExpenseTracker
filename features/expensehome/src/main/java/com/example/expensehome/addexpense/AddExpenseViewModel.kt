@@ -7,11 +7,17 @@ import com.example.data.model.Expense
 import com.example.data.remote.model.PromptType
 import com.example.mltoolkit.ReceiptTextExtractor
 import com.example.repository.ExpenseRepository
+import com.example.repository.ExpenseRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
@@ -22,29 +28,67 @@ internal class AddExpenseViewModel @Inject constructor(
     private val mutableViewState = MutableStateFlow(AddExpenseContract.ViewState.Default)
     val viewState = mutableViewState.asStateFlow()
 
-    fun onTitleChange(title: String) {
-        mutableViewState.update { it.copy(title = title) }
-    }
+    private val mutableActionFlow = MutableSharedFlow<AddExpenseContract.Actions>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
-    fun onAmountChange(amount: String) {
-        mutableViewState.update { it.copy(amount = amount) }
-    }
+    val actions = mutableActionFlow.asSharedFlow()
 
-    fun onCategoryChange(category: String) {
-        mutableViewState.update { it.copy(category = category) }
+    fun onEvent(event: AddExpenseContract.Event) {
+        when (event) {
+            is AddExpenseContract.Event.TitleChanged -> {
+                updateErrorMessage(null)
+                mutableViewState.update { it.copy(title = event.title) }
+            }
+
+            is AddExpenseContract.Event.AmountChanged -> {
+                updateErrorMessage(null)
+                mutableViewState.update { it.copy(amount = event.amount) }
+            }
+
+            is AddExpenseContract.Event.CategoryChanged -> {
+                updateErrorMessage(null)
+                mutableViewState.update { it.copy(category = event.category) }
+            }
+
+            is AddExpenseContract.Event.ImageCaptured -> onImageCaptured(event.file)
+            AddExpenseContract.Event.SaveExpenseClicked -> saveExpense()
+            AddExpenseContract.Event.AiCategorySearchClicked -> onAiCategorySearch()
+            AddExpenseContract.Event.ScanReceiptClicked -> {
+                mutableViewState.update { it.copy(addExpenseType = AddExpenseContract.AddExpenseType.SCAN) }
+            }
+        }
     }
 
     fun saveExpense() {
+        val currentState = mutableViewState.value
+        val amount = currentState.amount.toDoubleOrNull()
+        if (currentState.title.isBlank() || amount == null || amount <= 0.0) {
+            updateErrorMessage("Please fill all the mandatory fields")
+            return
+        }
         viewModelScope.launch {
             isSaving(true)
-            val expense = Expense(
-                category = mutableViewState.value.category,
-                amount = mutableViewState.value.amount.toDoubleOrNull() ?: 0.0,
-                title = mutableViewState.value.title
-            )
-            expenseRepository.insertExpense(expense)
-            isSaving(false)
+            withContext(Dispatchers.IO) {
+                try {
+                    val expense = Expense(
+                        category = mutableViewState.value.category.ifBlank { "Others" },
+                        amount = mutableViewState.value.amount.toDoubleOrNull() ?: 0.0,
+                        title = mutableViewState.value.title
+                    )
+                    expenseRepository.insertExpense(expense)
+                    mutableActionFlow.emit(AddExpenseContract.Actions.NavigateToHome)
+                    isSaving(false)
+                } catch (_: Exception) {
+                    updateErrorMessage("Couldn't save, please try again later")
+                }
+            }
         }
+    }
+
+    fun updateErrorMessage(message: String? = null) {
+        mutableViewState.update { it.copy(errorMessage = message) }
     }
 
     private fun isSaving(isSaving: Boolean) {
@@ -67,7 +111,7 @@ internal class AddExpenseViewModel @Inject constructor(
                     promptType = PromptType.CATEGORY_SUGGESTION
                 )
                 mutableViewState.update { it.copy(category = suggestion) }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 mutableViewState.update { it.copy(category = "Others") }
             } finally {
                 isSuggestionLoading(false)
@@ -75,15 +119,11 @@ internal class AddExpenseViewModel @Inject constructor(
         }
     }
 
-    fun onScanReceipt() {
-        mutableViewState.update { it.copy(addExpenseType = AddExpenseContract.ADD_EXPENSE_TYPE.SCAN) }
-    }
-
     fun onImageCaptured(it: File) {
         viewModelScope.launch {
             val text = ReceiptTextExtractor.extractText(it)
             fillFromText(text)
-            mutableViewState.update { it.copy(addExpenseType = AddExpenseContract.ADD_EXPENSE_TYPE.DEFAULT) }
+            mutableViewState.update { it.copy(addExpenseType = AddExpenseContract.AddExpenseType.DEFAULT) }
         }
     }
 
